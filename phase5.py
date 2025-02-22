@@ -27,28 +27,35 @@ class Phase5:
     
     def check_phase_n(self, n: int) -> None:
         correct_vocs = []
+        incorrect_vocs = []
         vocs = self.phases[5-n].vocs
         for voc in vocs:
             print(voc.native)
-            answer = Phase5.input_or_exit('Greek: ', self.forward_phase_m_to_phase_n, m=n, n=n-1, correct_vocs=correct_vocs).strip().lower()
+            answer = Phase5.input_or_exit('Greek: ', self.forward_phase_n, n=n, correct_vocs=correct_vocs, incorrect_vocs=incorrect_vocs).strip().lower()
             if answer == voc.greek:
                 print('Correct!')
                 correct_vocs.append(voc)
             else:
                 print('No, it\'s: ' + voc.greek)
+                incorrect_vocs.append(voc)
 
             print('\n')
         
-        self.forward_phase_m_to_phase_n(n, n-1, correct_vocs)
+        self.forward_phase_n(n, correct_vocs, incorrect_vocs)
     
 
-    def forward_phase_m_to_phase_n(self, m: int, n: int, correct_vocs: list[Voc]) -> None:
-        if m not in range(1, 6) or n not in range(1, 6):
+    def forward_phase_n(self, n: int, correct_vocs: list[Voc], incorrect_vocs: list[Voc]) -> None:
+        if n <= 0:
+            raise ValueError('n must be positive!')
+        
+        if n == 1:
+            Phase5.shift_vocs_from_phase_to_phase(incorrect_vocs, 'vocs/phase1.csv', 'vocs/phase5.csv')
             Phase5.shift_vocs_from_phase_to_phase(correct_vocs, 'vocs/phase1.csv', 'vocs/finished.csv')
             print('Finished!')
         else:
-            Phase5.shift_vocs_from_phase_to_phase(correct_vocs, f'vocs/phase{m}.csv', f'vocs/phase{n}.csv')
-            self.check_phase_n(n)
+            Phase5.shift_vocs_from_phase_to_phase(incorrect_vocs, f'vocs/phase{n}.csv', 'vocs/phase5.csv')
+            Phase5.shift_vocs_from_phase_to_phase(correct_vocs, f'vocs/phase{n}.csv', f'vocs/phase{n-1}.csv')
+            self.check_phase_n(n-1)
     
 
     def shift_vocs_from_phase_to_phase(vocs: list[Voc], src_phase_filepath: str, dst_phase_filepath: str) -> None:
