@@ -1,3 +1,5 @@
+import os
+
 from sys import exit
 
 from voc import Voc
@@ -64,7 +66,7 @@ class Phase5:
         for voc in vocs:
             src_vocs_to_filter.remove(voc)
 
-        with open(src_phase_filepath, 'w') as vocfile:
+        with open(src_phase_filepath, 'w+') as vocfile:
             vocfile.writelines([str(voc)+'\n' for voc in src_vocs_to_filter])
         
         Phase5.append_vocs_to_vocset(vocs, dst_phase_filepath)
@@ -85,6 +87,10 @@ class Phase5:
     def read_vocset(filepath: str) -> list[str]:
         ret = []
 
+        if not os.path.exists(filepath):
+            os.system('touch ' + filepath)
+            return []
+
         with open(filepath, 'r') as vocfile:
             for entry in vocfile:
                 native, greek = entry.strip().split(',')
@@ -94,7 +100,7 @@ class Phase5:
     
 
     def append_vocs_to_vocset(vocs: list[Voc], filepath: str) -> None:
-        with open(filepath, 'a') as vocfile:
+        with open(filepath, 'a+') as vocfile:
             vocfile.writelines([str(voc)+'\n' for voc in vocs])
             
 
